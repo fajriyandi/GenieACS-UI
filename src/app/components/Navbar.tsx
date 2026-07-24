@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import Swal from 'sweetalert2';
+import Link from 'next/link';
 
 export default function Navbar() {
   const router = useRouter();
@@ -36,6 +37,9 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
             <h1 className="text-xl font-black text-zinc-800 dark:text-white">GenieACS</h1>
+            <p className="ml-4 text-xs text-zinc-500 dark:text-zinc-400">
+              Developed by <Link href="https://github.com/fajriyandi" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Fajri Yandi</Link>
+            </p>
           </div>
           <div className="flex items-center">
             <button onClick={handleLogout}

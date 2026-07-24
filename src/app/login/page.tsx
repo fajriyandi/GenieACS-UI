@@ -43,6 +43,9 @@ export default function LoginPage() {
               <Server className="w-6 h-6" />
             </div>
             <h1 className="text-xl font-black text-zinc-900">GenieACS Manager</h1>
+            <p className="text-xs text-zinc-500 font-medium mt-1">
+              Developed by <a href="https://github.com/fajriyandi" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Fajri Yandi</a>
+            </p>
             <p className="text-xs text-zinc-500 font-medium mt-1">Masuk ke dashboard management</p>
           </div>
 

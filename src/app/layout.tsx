@@ -1,8 +1,10 @@
+'use client';
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar"; // Assume this path
-import Footer from "./components/Footer"; // Assume this path
+import Navbar from "./components/Navbar";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,24 +16,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "GenieACS Manager",
-  description: "TR-069 Device Management",
-};
+// Metadata tidak bisa di client component, pindahkan ke metadata.ts
+// export const metadata: Metadata = {
+//   title: "GenieACS Manager",
+//   description: "TR-069 Device Management",
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow pt-16">
+        {!isLoginPage && <Navbar />}
+        <main className={`flex-grow ${!isLoginPage ? 'pt-16' : ''}`}>
           {children}
         </main>
-        <Footer />
       </body>
     </html>
   );
