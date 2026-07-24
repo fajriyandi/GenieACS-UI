@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Server, Settings2, Activity, ChevronRight, ExternalLink } from 'lucide-react';
+import { Server, Settings2, Activity, ChevronRight, ExternalLink, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -71,6 +71,7 @@ export default function HomePage() {
             { href: '/devices', icon: Server, title: 'Devices', desc: 'Kelola perangkat TR-069, lihat detail, edit WiFi & WAN' },
             { href: '/tasks', icon: Activity, title: 'Tasks', desc: 'Queue dan status task background' },
             { href: '/settings', icon: Settings2, title: 'Settings & Mapping', desc: 'Konfigurasi NBI, parameter TR-069 & vendor mapping' },
+            { href: '/api-docs', icon: BookOpen, title: 'API Docs', desc: 'Dokumentasi endpoint API untuk integrasi' },
           ].map((item) => (
             <Link key={item.href} href={item.href}
               className="group border border-zinc-200/50 dark:border-white/10 shadow-lg bg-white/70 dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-5 hover:shadow-xl transition-all duration-300 hover:border-orange-500/20 active:scale-[0.99]"

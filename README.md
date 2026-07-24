@@ -53,7 +53,7 @@ Script `migrate` bikin tabel: `genieacs_settings`, `genieacs_parameter_mappings`
 
 Script `seed` isi:
 - Placeholder NBI settings (konfigurasi via UI)
-- Parameter mappings default
+- Parameter mappings default (17 mapping)
 - User admin default: **admin** / **admin**
 
 ## Dev
@@ -76,6 +76,7 @@ Akses `http://localhost:3000` → login dengan **admin** / **admin**.
 - Format: `ga_` + 48 hex chars, hash SHA256 disimpan
 - Header: `Authorization: Bearer <key>`
 - Setiap key bisa di-revoke terpisah
+- Guard otomatis di middleware untuk semua route API
 
 ### Device Management
 - Daftar device TR-069 dengan pagination & search
@@ -90,36 +91,109 @@ Akses `http://localhost:3000` → login dengan **admin** / **admin**.
 - In-memory cache untuk device list (TTL 1 menit)
 - Cache auto-clear setelah delete
 
-## Build & Deploy
+## API Reference
+
+Semua endpoint API (kecuali login) membutuhkan autentikasi via **session cookie** atau **API Key**.
+
+### API Key
+
+Generate key dari menu **Settings → API Keys**, lalu kirim sebagai header:
 
 ```bash
-npm run build
-npm start
+curl -H "Authorization: Bearer ga_xxx..." http://localhost:3000/api/settings/genieacs/devices?limit=5
 ```
 
-Atau pake PM2:
+### Device List
 
 ```bash
-npm i -g pm2
-pm2 start npm --name genieacs-ui -- start
-pm2 save
+curl -H "Authorization: Bearer ga_xxx..." \
+  "http://localhost:3000/api/settings/genieacs/devices?page=1&limit=50&status=online"
 ```
 
-### Reverse Proxy (Nginx)
+### Device Detail
 
-```nginx
-server {
-    listen 80;
-    server_name genieacs.example.com;
+```bash
+curl -H "Authorization: Bearer ga_xxx..." \
+  "http://localhost:3000/api/settings/genieacs/devices/[deviceId]/detail"
+```
 
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+### Update WiFi
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "wlanIndex": 1,
+    "ssid": "MyWiFi",
+    "password": "secret123",
+    "securityMode": "WPA2-PSK",
+    "enabled": true
+  }' \
+  "http://localhost:3000/api/genieacs/devices/[deviceId]/wifi"
+```
+
+### Manage WAN
+
+```bash
+# Edit WAN
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "edit",
+    "connectionType": "PPPoE",
+    "username": "user@isp.net",
+    "password": "pass123",
+    "vlanId": "10"
+  }' \
+  "http://localhost:3000/api/genieacs/devices/[deviceId]/wan"
+
+# Delete WAN
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  -H "Content-Type: application/json" \
+  -d '{"action": "delete", "path": "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1"}' \
+  "http://localhost:3000/api/genieacs/devices/[deviceId]/wan"
+```
+
+### Reboot Device
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  "http://localhost:3000/api/settings/genieacs/devices/[deviceId]/reboot"
+```
+
+### Refresh Parameters
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  "http://localhost:3000/api/settings/genieacs/devices/[deviceId]/refresh"
+```
+
+### Connection Request
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer ga_xxx..." \
+  "http://localhost:3000/api/genieacs/devices/[deviceId]/connection-request"
+```
+
+### User Management (admin only)
+
+```bash
+# Daftar users
+curl -H "Cookie: session_token=..." \
+  "http://localhost:3000/api/auth/users"
+
+# Tambah user
+curl -X POST \
+  -H "Cookie: session_token=..." \
+  -H "Content-Type: application/json" \
+  -d '{"username": "operator1", "password": "xxx", "displayName": "Operator", "role": "operator"}' \
+  "http://localhost:3000/api/auth/users"
 ```
 
 ## Struktur
@@ -128,12 +202,13 @@ server {
 src/
 ├── app/
 │   ├── api/
-│   │   ├── auth/              # Login, me, users (CRUD)
+│   │   ├── auth/              # Login, me, users (CRUD), validate-key
 │   │   └── settings/genieacs/ # NBI proxy, devices, parameters
 │   ├── devices/               # Device list & detail modal
 │   ├── settings/              # Settings, parameters, vendors, auth, users
 │   ├── tasks/                 # Task queue
-│   └── middleware.ts          # Auth guard
+│   ├── api-docs/              # API documentation page
+│   └── middleware.ts          # Auth guard (session + API key)
 ├── lib/
 │   ├── genieacs.ts            # Parameter helpers & extractors
 │   ├── auth.ts                # Password hashing, session

@@ -12,28 +12,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const authHeader = 'Basic ' + Buffer.from(`${username}:${pwd}`).toString('base64');
     const tasks = [];
     if (ssid) {
-      tasks.push({ name: 'setParameterValues', device: deviceId, parameterValues: [[`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.SSID`, ssid]] });
+      tasks.push(`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.SSID`, ssid);
     }
     if (password && securityMode !== 'None') {
-      tasks.push({ name: 'setParameterValues', device: deviceId, parameterValues: [[`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.PreSharedKey.1.KeyPassphrase`, password]] });
+      tasks.push(`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.PreSharedKey.1.KeyPassphrase`, password);
     }
     if (enabled !== undefined) {
-      tasks.push({ name: 'setParameterValues', device: deviceId, parameterValues: [[`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.Enable`, enabled ? '1' : '0']] });
+      tasks.push(`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.Enable`, enabled ? '1' : '0');
     }
-    if (securityMode) {
-      if (securityMode === 'None') {
-        tasks.push({ name: 'setParameterValues', device: deviceId, parameterValues: [[`InternetGatewayDevice.LANDevice.1.WLANConfiguration.${wlanIndex}.Enable`, '1']] });
-      }
-    }
-    const results = [];
-    for (const task of tasks) {
-      const res = await fetch(`${host}/tasks`, {
-        method: 'POST', headers: { Authorization: authHeader, 'Content-Type': 'application/json' }, body: JSON.stringify(task),
+    if (tasks.length > 0) {
+      const res = await fetch(`${host}/devices/${encodeURIComponent(deviceId)}/tasks?connection_request`, {
+        method: 'POST', headers: { 'Authorization': authHeader, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'setParameterValues',
+          parameterValues: tasks.reduce((acc: any[][], _, i, arr) => {
+            if (i % 2 === 0) acc.push([arr[i], arr[i+1]]);
+            return acc;
+          }, []),
+        }),
       });
-      const data = await res.json();
-      results.push(data);
+      const raw = await res.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { data = { raw: raw.substring(0,200) }; }
+      return NextResponse.json({ success: res.ok, task: data });
     }
-    return NextResponse.json({ success: true, tasks: results });
+    return NextResponse.json({ success: true, message: 'No changes' });
   } catch (e: any) {
     return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
