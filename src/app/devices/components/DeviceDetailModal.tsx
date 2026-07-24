@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Server, Loader2, RefreshCw, X, RotateCcw, Power, Edit, Globe, Activity, Smartphone, Wifi, Plus, Trash2 } from 'lucide-react';
 import { DeviceDetail, WLANConfig } from '../types';
+import { formatUptime } from '@/lib/utils';
 
 interface Props {
   show: boolean; device: DeviceDetail | null; loadingDetail: boolean;
@@ -96,7 +97,7 @@ export default function DeviceDetailModal({ show, device, loadingDetail, onClose
                     <InfoRow label="Software Version" value={device.softwareVersion} />
                     <InfoRow label="MAC Address" value={device.macAddress} />
                     <InfoRow label="TR-069 IP" value={device.tr069IP} />
-                    <InfoRow label="Uptime" value={device.uptime} />
+                    <InfoRow label="Uptime" value={formatUptime(device.uptime)} />
                     <InfoRow label="Last Inform" value={device.lastInform ? new Date(device.lastInform).toLocaleString('id-ID') : '-'} />
                     <InfoRow label="PPP Username" value={device.pppoeUsername} />
                     <InfoRow label="PPP IP" value={device.pppoeIP} />

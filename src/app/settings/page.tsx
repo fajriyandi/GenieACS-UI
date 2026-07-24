@@ -132,8 +132,8 @@ export default function SettingsPage() {
                 <Settings2 className="w-4 h-4 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-xs font-black">Parameter Mappings</h3>
-                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">Konfigurasi path parameter TR-069 multi-vendor</p>
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white">Parameter Mappings</h3>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">Konfigurasi path parameter TR-069 multi-vendor</p>
               </div>
             </div>
           </Link>
@@ -145,8 +145,8 @@ export default function SettingsPage() {
                 <Settings2 className="w-4 h-4 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-xs font-black">Vendor Mapping</h3>
-                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">Mapping WLAN index & write paths per vendor ONT</p>
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white">Vendor Mapping</h3>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">Mapping WLAN index & write paths per vendor ONT</p>
               </div>
             </div>
           </Link>
@@ -162,8 +162,8 @@ export default function SettingsPage() {
                 <Key className="w-4 h-4 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-xs font-black">API Keys</h3>
-                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">API Key management untuk integrasi 3rd party</p>
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white">API Keys</h3>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">API Key management untuk integrasi 3rd party</p>
               </div>
             </div>
           </Link>
@@ -175,8 +175,8 @@ export default function SettingsPage() {
                 <Users className="w-4 h-4 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-xs font-black">User Management</h3>
-                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">Kelola akun pengguna dashboard (admin & operator)</p>
+                <h3 className="text-xs font-black text-zinc-800 dark:text-white">User Management</h3>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">Kelola akun pengguna dashboard (admin & operator)</p>
               </div>
             </div>
           </Link>
