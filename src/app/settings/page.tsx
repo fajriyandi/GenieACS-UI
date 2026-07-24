@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Server, Loader2, Zap, Save, CheckCircle, Info, ChevronLeft, Settings2 } from 'lucide-react';
+import { Server, Loader2, Zap, Save, CheckCircle, Info, ChevronLeft, Settings2, Key } from 'lucide-react';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
 
@@ -147,6 +147,23 @@ export default function SettingsPage() {
               <div>
                 <h3 className="text-xs font-black">Vendor Mapping</h3>
                 <p className="text-[10px] text-zinc-500 font-medium mt-0.5">Mapping WLAN index & write paths per vendor ONT</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Authentication */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Link href="/settings/auth"
+            className="group border border-zinc-200/50 dark:border-white/10 shadow-lg bg-white/70 dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-5 hover:shadow-xl hover:border-orange-500/20 transition-all"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="p-2.5 bg-orange-500/10 dark:bg-orange-500/20 rounded-2xl">
+                <Key className="w-4 h-4 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xs font-black">Authentication</h3>
+                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">API Key management untuk integrasi 3rd party</p>
               </div>
             </div>
           </Link>

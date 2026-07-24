@@ -1,4 +1,17 @@
 import mysql from 'mysql2/promise';
+import crypto from 'crypto';
+import { config } from 'dotenv';
+config();
+
+function hashPassword(password) {
+  return new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    crypto.scrypt(password, salt, 64, (err, key) => {
+      if (err) reject(err);
+      else resolve(salt + ':' + key.toString('hex'));
+    });
+  });
+}
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -43,11 +56,23 @@ async function seed() {
         ['cpuUsage', 'InternetGatewayDevice.DeviceInfo.ProcessStatus.CPUUsage,InternetGatewayDevice.DeviceInfo.X_ZTE-COM_CpuUsed'],
         ['memoryFree', 'InternetGatewayDevice.DeviceInfo.MemoryStatus.Free,InternetGatewayDevice.DeviceInfo.X_ZTE-COM_MemUsed'],
       ];
-      const sql = 'INSERT INTO genieacs_parameter_mappings (param_name, param_paths, is_virtual) VALUES (?, ?, 0)';
-      for (const [name, paths] of params) {
-        await conn.execute(sql, [name, paths]);
+      const sql = 'INSERT INTO genieacs_parameter_mappings (paramKey, paths) VALUES (?, ?)';
+      for (const [name, pathList] of params) {
+        const pathsJson = JSON.stringify(pathList.split(','));
+        await conn.execute(sql, [name, pathsJson]);
       }
       console.log(`Seeded: ${params.length} parameter mappings`);
+    }
+
+    // Default admin user
+    const [existingUser] = await conn.execute('SELECT id FROM users LIMIT 1');
+    if (!existingUser.length) {
+      const pwHash = await hashPassword('admin');
+      await conn.execute(
+        'INSERT INTO users (username, password_hash, display_name, role, isActive) VALUES (?, ?, ?, ?, 1)',
+        ['admin', pwHash, 'Administrator', 'admin']
+      );
+      console.log('Seeded: default admin user (admin / admin)');
     }
 
     console.log('Seed complete');

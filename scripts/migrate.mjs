@@ -1,4 +1,6 @@
 import mysql from 'mysql2/promise';
+import { config } from 'dotenv';
+config();
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -41,6 +43,37 @@ async function migrate() {
       model VARCHAR(255) DEFAULT NULL,
       path_overrides TEXT DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Auth API keys
+    await conn.execute(`CREATE TABLE IF NOT EXISTS api_keys (
+      id VARCHAR(36) PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      key_value TEXT NOT NULL,
+      hashed_val VARCHAR(64) NOT NULL,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      lastUsedAt TIMESTAMP NULL
+    )`);
+
+    // Users
+    await conn.execute(`CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(100) NOT NULL UNIQUE,
+      password_hash VARCHAR(255) NOT NULL,
+      display_name VARCHAR(255) DEFAULT NULL,
+      role ENUM('admin','operator') DEFAULT 'operator',
+      isActive TINYINT(1) DEFAULT 1,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    // Sessions
+    await conn.execute(`CREATE TABLE IF NOT EXISTS sessions (
+      token VARCHAR(64) PRIMARY KEY,
+      user_id INT NOT NULL,
+      expires_at DATETIME NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
     console.log('Migration complete');

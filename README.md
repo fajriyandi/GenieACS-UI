@@ -4,8 +4,8 @@ Dashboard web untuk manage perangkat ONT/router via GenieACS NBI.
 
 ## Tech Stack
 
-- **Next.js 14** (App Router + TypeScript)
-- **Tailwind CSS** (styling)
+- **Next.js 16** (App Router + TypeScript)
+- **Tailwind CSS 4** (styling)
 - **lucide-react** (icons)
 - **sweetalert2** (notifikasi)
 - **MariaDB/MySQL** (db via mysql2)
@@ -29,12 +29,9 @@ Copy `.env.example` ke `.env`:
 ```env
 # Database
 DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=genieacs
-
-# Enkripsi password settings (32 karakter, opsional — ada fallback default)
-# ENCRYPTION_KEY=your-32-char-key
+DB_USER=GenieACS
+DB_PASSWORD=GenieACS
+DB_NAME=GenieACS
 ```
 
 ## Database
@@ -42,7 +39,7 @@ DB_NAME=genieacs
 Buat database dulu:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS genieacs;
+CREATE DATABASE IF NOT EXISTS GenieACS;
 ```
 
 Migrasi & seed otomatis:
@@ -52,13 +49,12 @@ npm run migrate
 npm run seed
 ```
 
-Atau satu baris:
+Script `migrate` bikin tabel: `genieacs_settings`, `genieacs_parameter_mappings`, `genieacs_vendor_mappings`, `api_keys`, `users`, `sessions`.
 
-```bash
-npm run migrate && npm run seed
-```
-
-Script `migrate` bikin tabel (`genieacs_settings`, `genieacs_parameter_mappings`, `genieacs_vendor_mappings`). Script `seed` isi default NBI settings + parameter mappings awal.
+Script `seed` isi:
+- Placeholder NBI settings (konfigurasi via UI)
+- Parameter mappings default
+- User admin default: **admin** / **admin**
 
 ## Dev
 
@@ -66,7 +62,33 @@ Script `migrate` bikin tabel (`genieacs_settings`, `genieacs_parameter_mappings`
 npm run dev
 ```
 
-Akses `http://localhost:3000`.
+Akses `http://localhost:3000` → login dengan **admin** / **admin**.
+
+## Fitur
+
+### Authentication & User Management
+- Login/logout dengan session cookie
+- Role: **admin** & **operator**
+- Manage users (admin only): tambah, edit, hapus, aktif/nonaktif
+
+### API Key Authentication
+- Generate API key untuk integrasi 3rd party
+- Format: `ga_` + 48 hex chars, hash SHA256 disimpan
+- Header: `Authorization: Bearer <key>`
+- Setiap key bisa di-revoke terpisah
+
+### Device Management
+- Daftar device TR-069 dengan pagination & search
+- Filter Online/Offline (akurat, fetch all + filter di server)
+- Detail device: Info → Optical → WAN → WiFi → Clients
+- Tab layout dengan grid per-seksi
+- Edit WiFi per SSID
+- Add/Edit/Delete WAN connection
+- Reboot & refresh parameters
+
+### Caching
+- In-memory cache untuk device list (TTL 1 menit)
+- Cache auto-clear setelah delete
 
 ## Build & Deploy
 
@@ -100,33 +122,24 @@ server {
 }
 ```
 
-## API Routes
-
-| Route | Method | Desc |
-|-------|--------|------|
-| `/api/genieacs` | GET/PUT | Settings NBI (host, port, user, password) |
-| `/api/genieacs/parameters` | GET/POST | Parameter mappings |
-| `/api/genieacs/vendors` | GET/POST/DELETE | Vendor mappings |
-| `/api/genieacs/tasks` | GET | Daftar task device |
-| `/api/genieacs/devices` | GET | Daftar device (pagination, filter) |
-| `/api/genieacs/devices/[id]/detail` | GET | Detail device (WiFi, WAN, clients, optical) |
-| `/api/genieacs/devices/[id]/reboot` | POST | Reboot device |
-| `/api/genieacs/devices/[id]/refresh` | POST | Refresh parameters |
-| `/api/genieacs/devices/[id]/wifi` | PUT | Update WiFi config |
-| `/api/genieacs/devices/[id]/wan` | POST/PUT/DELETE | Manage WAN connection |
-
 ## Struktur
 
 ```
 src/
 ├── app/
-│   ├── api/           # API routes
-│   ├── devices/       # Device list & detail
-│   ├── globals.css
-│   └── layout.tsx
+│   ├── api/
+│   │   ├── auth/              # Login, me, users (CRUD)
+│   │   └── settings/genieacs/ # NBI proxy, devices, parameters
+│   ├── devices/               # Device list & detail modal
+│   ├── settings/              # Settings, parameters, vendors, auth, users
+│   ├── tasks/                 # Task queue
+│   └── middleware.ts          # Auth guard
 ├── lib/
-│   └── genieacs.ts    # Parameter helpers & extractors
+│   ├── genieacs.ts            # Parameter helpers & extractors
+│   ├── auth.ts                # Password hashing, session
+│   ├── cache.ts               # In-memory cache
+│   └── db.ts                  # MySQL pool
 └── scripts/
-    ├── migrate.mjs    # Migration
-    └── seed.mjs       # Seed data
+    ├── migrate.mjs            # Migration
+    └── seed.mjs               # Seed data
 ```
