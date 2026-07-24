@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GenieACS UI
 
-## Getting Started
+Dashboard web untuk manage perangkat ONT/router via GenieACS NBI.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 14** (App Router + TypeScript)
+- **Tailwind CSS** (styling)
+- **lucide-react** (icons)
+- **sweetalert2** (notifikasi)
+- **MariaDB/MySQL** (db koneksi via mysql2)
+
+## Prasyarat
+
+- Node.js 18+
+- MariaDB/MySQL
+- GenieACS NBI (HTTP, port 7557)
+
+## Instalasi
+
+```bash
+npm install
+```
+
+## Konfigurasi
+
+Copy `.env.example` ke `.env`:
+
+```env
+# Database (settings & parameter mappings)
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=genieacs
+
+# Enkripsi password settings (32 karakter)
+ENCRYPTION_KEY=your-32-char-encryption-key-here
+```
+
+> **Catatan:** `ENCRYPTION_KEY` harus **32 karakter** (untuk AES-256-CBC).
+
+## Database
+
+Buat tabel:
+
+```sql
+CREATE TABLE genieacs_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  key_name VARCHAR(255) NOT NULL UNIQUE,
+  key_value TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE genieacs_parameter_mappings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  param_name VARCHAR(255) NOT NULL UNIQUE,
+  param_paths TEXT NOT NULL,
+  param_unit VARCHAR(50) DEFAULT NULL,
+  is_virtual TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE genieacs_vendor_mappings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  oui VARCHAR(10) NOT NULL,
+  manufacturer VARCHAR(255) NOT NULL,
+  model VARCHAR(255) DEFAULT NULL,
+  path_overrides TEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Dev
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Akses `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build & Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+Atau pake PM2:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm i -g pm2
+pm2 start npm --name genieacs-ui -- start
+pm2 save
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Reverse Proxy (Nginx)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```nginx
+server {
+    listen 80;
+    server_name genieacs.example.com;
 
-## Deploy on Vercel
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Semua route ada di `src/app/api/`:
+
+| Route | Method | Desc |
+|-------|--------|------|
+| `/api/genieacs` | GET/PUT | Settings NBI (host, port, user, password) |
+| `/api/genieacs/parameters` | GET/POST | Parameter mappings |
+| `/api/genieacs/vendors` | GET/POST/DELETE | Vendor mappings |
+| `/api/genieacs/tasks` | GET | Daftar task device |
+| `/api/genieacs/devices` | GET | Daftar device (pagination, filter) |
+| `/api/genieacs/devices/[id]/detail` | GET | Detail device (WiFi, WAN, clients, optical) |
+| `/api/genieacs/devices/[id]/reboot` | POST | Reboot device |
+| `/api/genieacs/devices/[id]/refresh` | POST | Refresh parameters |
+| `/api/genieacs/devices/[id]/wifi` | PUT | Update WiFi config |
+| `/api/genieacs/devices/[id]/wan` | POST/PUT/DELETE | Manage WAN connection |
+
+## Struktur
+
+```
+src/
+├── app/
+│   ├── api/           # API routes
+│   ├── devices/       # Device list & detail
+│   ├── globals.css
+│   └── layout.tsx
+└── lib/
+    └── genieacs.ts    # Parameter helpers & extractors
+```
