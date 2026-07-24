@@ -225,4 +225,5 @@ src/
 | **Login** | ![Login](public/screenshots/login.png) |
 | **Dashboard** | ![Dashboard](public/screenshots/dashboard.png) |
 | **Device List** | ![Devices](public/screenshots/devices.png) |
+| **Device Detail** | ![Device Detail](public/screenshots/device-detail.png) |
 | **Settings** | ![Settings](public/screenshots/settings.png) |
