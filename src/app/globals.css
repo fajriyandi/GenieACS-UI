@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-zinc-150: #ececed;
+  --color-zinc-205: #e1e1e4;
+  --color-zinc-250: #dddde0;
+  --color-zinc-405: #9f9fa6;
+  --color-zinc-450: #80808b;
+  --color-zinc-455: #7b7b86;
+  --color-zinc-505: #6c6c78;
+  --color-zinc-550: #626270;
+  --color-zinc-555: #5d5d68;
+  --color-zinc-650: #4c4c56;
+  --color-zinc-655: #474751;
+  --color-zinc-705: #3c3c43;
+  --color-zinc-750: #333339;
+  --color-zinc-805: #242429;
+  --color-zinc-850: #1b1b1f;
+  --color-zinc-855: #161619;
+  --color-zinc-955: #09090b;
+
+  --color-rose-605: #e11d48;
+  --color-rose-650: #be123c;
+  --color-rose-455: #f43f5e;
+  --color-emerald-650: #047857;
+  --color-emerald-655: #047857;
+  --color-emerald-555: #10b981;
+  --color-orange-655: #c2410c;
+  --color-orange-605: #ea580c;
+  --color-orange-500: #f97316;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+}
+
+[data-mode="dark"], .dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.85 0 0) transparent;
+}
+
+body {
+  background: #fafafa;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.dark body {
+  background: #09090b;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
