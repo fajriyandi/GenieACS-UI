@@ -7,7 +7,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci && npm cache clean --force
-COPY tsconfig.json next.config.ts ./
+COPY tsconfig.json next.config.ts postcss.config.mjs ./
 COPY public ./public
 COPY scripts ./scripts
 COPY src ./src
@@ -29,4 +29,5 @@ USER nextjs
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
-CMD ["node_modules/.bin/next", "start"]
+ENV HOST=0.0.0.0
+CMD ["node_modules/.bin/next", "start", "-H", "0.0.0.0"]

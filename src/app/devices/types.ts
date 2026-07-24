@@ -7,6 +7,7 @@ export interface GenieACSDevice {
 export interface WLANConfig {
   index: number; ssid: string; enabled: boolean; channel: string;
   security: string; password: string; band: string; totalAssociations: number;
+  connectedClients: number;
 }
 
 export interface ConnectedHost {

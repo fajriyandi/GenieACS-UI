@@ -33,6 +33,7 @@ services:
 
   migrate:
     build: .
+    user: root
     command: node scripts/migrate.mjs
     environment:
       - DB_HOST=db
@@ -46,6 +47,7 @@ services:
 
   seed:
     build: .
+    user: root
     command: node scripts/seed.mjs
     environment:
       - DB_HOST=db

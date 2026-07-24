@@ -417,7 +417,7 @@ export function extractConnectedHosts(device: Record<string, unknown>): Connecte
     res.push({
       hostName: safeString(host['HostName']), ipAddress: safeString(host['IPAddress']),
       macAddress: safeString(host['MACAddress']), interfaceType: safeString(host['InterfaceType']),
-      active: isTruthyValue(host['Active']?._value ?? host['Active']),
+      active: isTruthyValue((host['Active'] as any)?._value ?? host['Active']),
       layer2Interface: safeString(host['Layer2Interface']),
       ssidIndex: 0,
     });

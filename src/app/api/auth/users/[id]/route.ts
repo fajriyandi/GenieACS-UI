@@ -12,14 +12,15 @@ async function requireAdmin(request: NextRequest) {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
   try {
+    const { id } = await params;
     const { username, password, displayName, role, isActive } = await request.json();
-    const user = await queryOne('SELECT id FROM users WHERE id = ?', [params.id]);
+    const user = await queryOne('SELECT id FROM users WHERE id = ?', [id]);
     if (!user) return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
 
     const updates: string[] = [];
@@ -37,7 +38,7 @@ export async function PATCH(
 
     if (updates.length === 0) return NextResponse.json({ success: false, error: 'No changes' }, { status: 400 });
 
-    values.push(params.id);
+    values.push(id);
     await query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
 
     return NextResponse.json({ success: true });
@@ -48,16 +49,17 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
   try {
-    if (params.id === String(admin.user_id)) {
+    const { id } = await params;
+    if (id === String(admin.user_id)) {
       return NextResponse.json({ success: false, error: 'Tidak bisa menghapus diri sendiri' }, { status: 400 });
     }
-    await query('DELETE FROM users WHERE id = ?', [params.id]);
+    await query('DELETE FROM users WHERE id = ?', [id]);
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ success: false, error: e.message }, { status: 500 });

@@ -1,7 +1,5 @@
 import mysql from 'mysql2/promise';
 import crypto from 'crypto';
-import { config } from 'dotenv';
-config();
 
 function hashPassword(password) {
   return new Promise((resolve, reject) => {
@@ -56,10 +54,9 @@ async function seed() {
         ['cpuUsage', 'InternetGatewayDevice.DeviceInfo.ProcessStatus.CPUUsage,InternetGatewayDevice.DeviceInfo.X_ZTE-COM_CpuUsed'],
         ['memoryFree', 'InternetGatewayDevice.DeviceInfo.MemoryStatus.Free,InternetGatewayDevice.DeviceInfo.X_ZTE-COM_MemUsed'],
       ];
-      const sql = 'INSERT INTO genieacs_parameter_mappings (paramKey, paths) VALUES (?, ?)';
+      const sql = 'INSERT INTO genieacs_parameter_mappings (param_name, param_paths, is_virtual) VALUES (?, ?, 0)';
       for (const [name, pathList] of params) {
-        const pathsJson = JSON.stringify(pathList.split(','));
-        await conn.execute(sql, [name, pathsJson]);
+        await conn.execute(sql, [name, pathList]);
       }
       console.log(`Seeded: ${params.length} parameter mappings`);
     }
