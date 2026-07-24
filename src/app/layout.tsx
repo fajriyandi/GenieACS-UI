@@ -24,7 +24,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <main className="flex-1">
+          {children}
+        </main>
+        <footer className="text-center text-[10px] text-zinc-400 py-3 border-t border-zinc-100">
+          Created by Fajri Yandi
+        </footer>
+      </body>
     </html>
   );
 }
