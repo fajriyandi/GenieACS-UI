@@ -224,9 +224,9 @@ export default function GenieACSDevicesPage() {
           onForceSync={handleForceSync}
           onRefreshParameters={handleRefreshParameters}
           onReboot={handleReboot}
-          onOpenEditWifi={(id,wlan)=>{setShowDetailModal(false);openEditWifiModal(id,wlan);}}
-          onOpenEditWan={(device,conn)=>{setShowDetailModal(false);setEditWanData({deviceId:device._id,action:'edit',connectionType:conn?.connectionType||'PPPoE',name:conn?.name||'INTERNET',username:conn?.username||'',password:'',vlanId:conn?.vlanId||'',bindingPorts:conn?.bindingPorts||[],serviceList:conn?.serviceList||'INTERNET'});setShowEditWanModal(true);}}
-          onOpenAddWan={(device)=>{setShowDetailModal(false);setEditWanData({deviceId:device._id,action:'add',connectionType:'PPPoE',name:'INTERNET',username:'',password:'',vlanId:'',bindingPorts:[],serviceList:'INTERNET'});setShowEditWanModal(true);}}
+          onOpenEditWifi={(id,wlan)=>{openEditWifiModal(id,wlan);}}
+          onOpenEditWan={(device,conn)=>{setEditWanData({deviceId:device._id,action:'edit',connectionType:conn?.connectionType||'PPPoE',name:conn?.name||'INTERNET',username:conn?.username||'',password:'',vlanId:conn?.vlanId||'',bindingPorts:conn?.bindingPorts||[],serviceList:conn?.serviceList||'INTERNET'});setShowEditWanModal(true);}}
+          onOpenAddWan={(device)=>{setEditWanData({deviceId:device._id,action:'add',connectionType:'PPPoE',name:'INTERNET',username:'',password:'',vlanId:'',bindingPorts:[],serviceList:'INTERNET'});setShowEditWanModal(true);}}
           onDeleteWan={async (device,conn)=>{if(!conn?.path)return;try{await fetch(`/api/genieacs/devices/${encodeURIComponent(device._id)}/wan`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',path:conn.path})});Swal.fire({icon:'success',title:'Berhasil',timer:2000,showConfirmButton:false,heightAuto:false});}catch(err:any){Swal.fire({icon:'error',title:'Error',text:err.message,heightAuto:false});}}}
         />
 
