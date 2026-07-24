@@ -1,0 +1,61 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=genieacs
+      - DB_PASSWORD=genieacs
+      - DB_NAME=genieacs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  db:
+    image: mariadb:11
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=genieacs
+      - MYSQL_USER=genieacs
+      - MYSQL_PASSWORD=genieacs
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    build: .
+    command: node scripts/migrate.mjs
+    environment:
+      - DB_HOST=db
+      - DB_USER=genieacs
+      - DB_PASSWORD=genieacs
+      - DB_NAME=genieacs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: no
+
+  seed:
+    build: .
+    command: node scripts/seed.mjs
+    environment:
+      - DB_HOST=db
+      - DB_USER=genieacs
+      - DB_PASSWORD=genieacs
+      - DB_NAME=genieacs
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: no
+
+volumes:
+  db_data:

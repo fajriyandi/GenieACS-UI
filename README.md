@@ -24,7 +24,7 @@ npm install
 
 ## Konfigurasi
 
-Copy `.env.example` ke `.env`:
+Copy `env.example` ke `.env`:
 
 ```env
 # Database
