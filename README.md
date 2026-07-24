@@ -8,7 +8,7 @@ Dashboard web untuk manage perangkat ONT/router via GenieACS NBI.
 - **Tailwind CSS** (styling)
 - **lucide-react** (icons)
 - **sweetalert2** (notifikasi)
-- **MariaDB/MySQL** (db koneksi via mysql2)
+- **MariaDB/MySQL** (db via mysql2)
 
 ## Prasyarat
 
@@ -27,7 +27,7 @@ npm install
 Copy `.env.example` ke `.env`:
 
 ```env
-# Database (settings & parameter mappings)
+# Database
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
@@ -37,40 +37,28 @@ DB_NAME=genieacs
 # ENCRYPTION_KEY=your-32-char-key
 ```
 
-> **Catatan:** `ENCRYPTION_KEY` harus **32 karakter** (untuk AES-256-CBC).
-
 ## Database
 
-Buat tabel:
+Buat database dulu:
 
 ```sql
-CREATE TABLE genieacs_settings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  key_name VARCHAR(255) NOT NULL UNIQUE,
-  key_value TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE genieacs_parameter_mappings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  param_name VARCHAR(255) NOT NULL UNIQUE,
-  param_paths TEXT NOT NULL,
-  param_unit VARCHAR(50) DEFAULT NULL,
-  is_virtual TINYINT(1) DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE genieacs_vendor_mappings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  oui VARCHAR(10) NOT NULL,
-  manufacturer VARCHAR(255) NOT NULL,
-  model VARCHAR(255) DEFAULT NULL,
-  path_overrides TEXT DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE DATABASE IF NOT EXISTS genieacs;
 ```
+
+Migrasi & seed otomatis:
+
+```bash
+npm run migrate
+npm run seed
+```
+
+Atau satu baris:
+
+```bash
+npm run migrate && npm run seed
+```
+
+Script `migrate` bikin tabel (`genieacs_settings`, `genieacs_parameter_mappings`, `genieacs_vendor_mappings`). Script `seed` isi default NBI settings + parameter mappings awal.
 
 ## Dev
 
@@ -112,9 +100,7 @@ server {
 }
 ```
 
-## API
-
-Semua route ada di `src/app/api/`:
+## API Routes
 
 | Route | Method | Desc |
 |-------|--------|------|
@@ -138,6 +124,9 @@ src/
 │   ├── devices/       # Device list & detail
 │   ├── globals.css
 │   └── layout.tsx
-└── lib/
-    └── genieacs.ts    # Parameter helpers & extractors
+├── lib/
+│   └── genieacs.ts    # Parameter helpers & extractors
+└── scripts/
+    ├── migrate.mjs    # Migration
+    └── seed.mjs       # Seed data
 ```
