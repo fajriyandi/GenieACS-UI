@@ -33,8 +33,8 @@ DB_USER=root
 DB_PASSWORD=
 DB_NAME=genieacs
 
-# Enkripsi password settings (32 karakter)
-ENCRYPTION_KEY=your-32-char-encryption-key-here
+# Enkripsi password settings (32 karakter, opsional — ada fallback default)
+# ENCRYPTION_KEY=your-32-char-key
 ```
 
 > **Catatan:** `ENCRYPTION_KEY` harus **32 karakter** (untuk AES-256-CBC).
