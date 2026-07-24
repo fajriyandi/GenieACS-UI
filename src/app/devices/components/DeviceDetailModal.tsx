@@ -219,12 +219,12 @@ export default function DeviceDetailModal({ show, device, loadingDetail, onClose
                               </div>
                               <div>
                                 <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">{wlan.ssid || '-'}</p>
-                                <p className="text-[10px] text-zinc-500">{wlan.band} • Ch {wlan.channel} • {wlan.security || 'Open'}</p>
+                                <p className="text-[10px] text-zinc-500">{wlan.band} • Ch {wlan.channel} • {wlan.security || 'Open'} • {wlan.connectedClients ?? 0} client</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${wlan.enabled ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-zinc-200 text-zinc-600 dark:bg-zinc-700'}`}>{wlan.enabled ? 'ON' : 'OFF'}</span>
-                              <button onClick={() => onOpenEditWifi(device._id, wlan)} className="p-1 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded cursor-pointer"><Edit className="w-3 h-3" /></button>
+                              <button onClick={() => onOpenEditWifi(device._id, wlan)} className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors cursor-pointer"><Edit className="w-3 h-3" /></button>
                             </div>
                           </div>
                         ))}
@@ -232,15 +232,6 @@ export default function DeviceDetailModal({ show, device, loadingDetail, onClose
                     </div>
                   ) : (
                     <div className="text-center py-8 text-zinc-500 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700"><Wifi className="w-8 h-8 mx-auto mb-2 opacity-50" /><p className="text-xs">Tidak ada data WiFi</p></div>
-                  )}
-                  {device.wlanConfigs && device.wlanConfigs.length > 0 && (
-                    <div className="flex gap-2">
-                      {device.wlanConfigs.map((wlan, idx) => (
-                        <button key={idx} onClick={() => onOpenEditWifi(device._id, wlan)} className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors cursor-pointer">
-                          <Edit className="w-3 h-3" /> Edit {wlan.ssid || `SSID${wlan.index}`}
-                        </button>
-                      ))}
-                    </div>
                   )}
                 </div>
               )}

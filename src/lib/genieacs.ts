@@ -183,6 +183,7 @@ export const GENIEACS_PARAMETER_PATHS = {
 export interface WLANConfig {
   index: number; ssid: string; enabled: boolean; channel: string;
   security: string; password: string; band: string; totalAssociations: number;
+  connectedClients: number;
 }
 
 export interface ConnectedHost {
@@ -358,7 +359,7 @@ export function extractWLANConfigs(device: Record<string, unknown>, manufacturer
                 return '';
               };
               const password = getPwd(wlan);
-              res.push({ index, ssid, enabled, channel: safeString(wlan['Channel']), security, password, band, totalAssociations: totalAssoc });
+              res.push({ index, ssid, enabled, channel: safeString(wlan['Channel']), security, password, band, totalAssociations: totalAssoc, connectedClients: totalAssoc });
             }
           }
         }
