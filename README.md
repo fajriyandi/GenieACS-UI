@@ -217,3 +217,12 @@ src/
     ├── migrate.mjs            # Migration
     └── seed.mjs               # Seed data
 ```
+
+## Screenshots
+
+| Halaman | Tampilan |
+|---------|----------|
+| **Login** | ![Login](public/screenshots/login.png) |
+| **Dashboard** | ![Dashboard](public/screenshots/dashboard.png) |
+| **Device List** | ![Devices](public/screenshots/devices.png) |
+| **Settings** | ![Settings](public/screenshots/settings.png) |
