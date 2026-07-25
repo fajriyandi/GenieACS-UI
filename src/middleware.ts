@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const publicPaths = ['/login', '/api/auth/login', '/api/auth/me', '/api/auth/validate-key'];
+const BASE = 'http://localhost:3000';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,10 +20,8 @@ export async function middleware(request: NextRequest) {
     const match = authHeader.match(/^Bearer\s+(.+)$/i);
 
     if (match) {
-      // Validate key via internal API (not direct DB — Edge runtime)
       try {
-        const validateUrl = new URL('/api/auth/validate-key', request.url);
-        const res = await fetch(validateUrl, {
+        const res = await fetch(`${BASE}/api/auth/validate-key`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: match[1] }),
@@ -36,7 +35,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('session_token')?.value;
     if (token) {
       try {
-        const res = await fetch(new URL('/api/auth/me', request.url), {
+        const res = await fetch(`${BASE}/api/auth/me`, {
           headers: { Cookie: `session_token=${token}` },
         });
         const data = await res.json();
@@ -54,7 +53,7 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const res = await fetch(new URL('/api/auth/me', request.url), {
+    const res = await fetch(`${BASE}/api/auth/me`, {
       headers: { Cookie: `session_token=${token}` },
     });
     const data = await res.json();
